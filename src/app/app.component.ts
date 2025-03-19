@@ -73,6 +73,18 @@ export class AppComponent implements OnInit {
 
   async* inferPromptApi(userPrompt: string) {
     // LAB #9
+    const systemPrompt = `
+  The user will ask questions about their todo list.
+  Here's the user's todo list:
+  ${this.todos().map(todo => `* ${todo.text} (${todo.done ? 'done' : 'notdone'})`).join('\n')}`;
+    const session = await window.ai.languageModel.create({ systemPrompt });
+    const chunks = session.promptStreaming(userPrompt);
+    let reply = '';
+    for await (const chunk of chunks) {
+      reply += chunk;
+      yield reply;
+    }
+
   }
 
   addTodo() {
