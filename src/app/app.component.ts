@@ -6,7 +6,7 @@ import {MatButton, MatFabButton} from '@angular/material/button';
 import {MatIcon} from '@angular/material/icon';
 import {MatFormField} from '@angular/material/form-field';
 import {MatInput, MatInputModule} from '@angular/material/input';
-import {CreateMLCEngine, MLCEngine} from '@mlc-ai/web-llm';
+import {ChatCompletionMessageParam, CreateMLCEngine, MLCEngine} from '@mlc-ai/web-llm';
 
 @Component({
     selector: 'app-root',
@@ -21,6 +21,7 @@ export class AppComponent implements OnInit {
   protected engine?: MLCEngine;
 
   // LAB #3
+  protected readonly reply = signal('');
 
   // LAB #5
 
@@ -36,10 +37,26 @@ export class AppComponent implements OnInit {
 
   async runPrompt(userPrompt: string, languageModel: string) {
     // LAB #3
+    this.reply.set('…');
+
+    const chunks = languageModel === 'webllm'
+      ? await this.inferWebLLM(userPrompt)
+      : await this.inferPromptApi(userPrompt);
+    for await (const chunk of chunks) {
+      this.reply.set(chunk);
+    }
   }
 
   async* inferWebLLM(userPrompt: string): AsyncGenerator<string> {
     // LAB #3, #7, #8
+    await this.engine!.resetChat();
+    const messages: ChatCompletionMessageParam[] = [{role: "user", content: userPrompt}];
+    const chunks = await this.engine!.chat.completions.create({messages, stream: true});
+    let reply = '';
+    for await (const chunk of chunks) {
+      reply += chunk.choices[0]?.delta.content ?? '';
+      yield reply;
+    }
   }
 
   async* inferPromptApi(userPrompt: string) {
