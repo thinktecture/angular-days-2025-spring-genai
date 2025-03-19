@@ -1,0 +1,24 @@
+.container {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.prompt {
+  flex: 1;
+}
+
+pre {
+  text-wrap: wrap;
+  flex: 1;
+}
+
+.container {
+  margin-inline: -16px;
+}
+
+button[mat-fab] {
+  position: absolute;
+  bottom: 92px;
+  right: 16px;
+}
