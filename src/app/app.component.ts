@@ -52,7 +52,12 @@ export class AppComponent implements OnInit {
   async* inferWebLLM(userPrompt: string): AsyncGenerator<string> {
     // LAB #3, #7, #8
     await this.engine!.resetChat();
-    const messages: ChatCompletionMessageParam[] = [{role: "user", content: userPrompt}];
+    const systemPrompt = `Here's the user's todo list:
+      ${this.todos().map(todo => `* ${todo.text} (${todo.done ? 'done' : 'not done'})`).join('\n')}`;
+    const messages: ChatCompletionMessageParam[] = [
+      { role: "system", content: systemPrompt },
+      { role: "user", content: userPrompt }
+    ];
     const chunks = await this.engine!.chat.completions.create({messages, stream: true});
     let reply = '';
     for await (const chunk of chunks) {
