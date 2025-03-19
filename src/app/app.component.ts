@@ -7,6 +7,7 @@ import {MatIcon} from '@angular/material/icon';
 import {MatFormField} from '@angular/material/form-field';
 import {MatInput, MatInputModule} from '@angular/material/input';
 import {ChatCompletionMessageParam, CreateMLCEngine, MLCEngine} from '@mlc-ai/web-llm';
+import {Todo} from './todo';
 
 @Component({
     selector: 'app-root',
@@ -24,6 +25,7 @@ export class AppComponent implements OnInit {
   protected readonly reply = signal('');
 
   // LAB #5
+  protected readonly todos = signal<Todo[]>([]);
 
   async ngOnInit() {
     // LAB #2
@@ -65,5 +67,7 @@ export class AppComponent implements OnInit {
 
   addTodo() {
     // LAB #5
+    const text = prompt() ?? '';
+    this.todos.update(todos => [...todos,  { done: false, text }]);
   }
 }
